@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>送信テスト</title>
+</head>
+<body>
+  <button id="sendButton">押す</button>
+  <p id="status"></p>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbyXRauGOr2oimJBpfe8yar4SPfcHVNiF1MZPNuoU-ut8F6_FQpPrfHbfZA-lfWYBLqfXw/exec';
+
+    const button = document.getElementById('sendButton');
+    const status = document.getElementById('status');
+
+    button.addEventListener('click', async () => {
+      button.disabled = true;            // 送信中の連打を防ぐ
+      status.textContent = '送信中…';
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },  // 事前確認（プリフライト）を避ける
+          body: JSON.stringify({ clickedAt: new Date().toISOString() })
+        });
+        const json = await res.json();
+        status.textContent = json.ok ? '送信しました' : '失敗しました';
+      } catch (err) {
+        status.textContent = '送信できませんでした：' + err;
+      }
+      button.disabled = false;
+    });
+  </script>
+</body>
+</html>
